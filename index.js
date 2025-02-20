@@ -38,7 +38,72 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
+    const database = client.db("taskManager");
+    const usersCollection = database.collection("users");
+
+
+    app.post('/users', async (req, res) => {
+        const user = req.body;
+
+        const existingUser = await usersCollection.findOne({ email: user.email });
+        if (existingUser) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'User already exists' 
+            });
+        }
+    
+
+        user.createdAt = new Date();
+        user.updatedAt = new Date();
+
+        const result = await usersCollection.insertOne(user);
+        
+        if (result.insertedId) {
+            return res.status(201).json({
+                success: true,
+                message: 'User created successfully',
+                user: {
+                    uid: user.uid,
+                    email: user.email,
+                    name: user.name,
+                    role: user.role
+                }
+            });
+        }
+    
+        res.status(400).json({ 
+            success: false, 
+            message: 'Failed to create user' 
+        });
+    });
+
+
+    app.get('/users/:email', async (req, res) => {
+        const { email } = req.params;
+        const user = await usersCollection.findOne(
+            { email },
+            { projection: { _id: 0, password: 0 } }
+        );
+        
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+    
+        res.json({
+            success: true,
+            user
+        });
+    });
+
+
+
+
+
     // Send a ping to confirm a successful connection
 
 
