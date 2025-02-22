@@ -10,7 +10,7 @@ const port = process.env.PORT || 5000;
 //middleware
 app.use(express.json());
 app.use(cors({
-    origin: ['http://localhost:5173'],
+    origin: ['http://localhost:5173',"https://personalized-taskmanager.netlify.app/"],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE']
 })); 
@@ -225,8 +225,8 @@ async function run() {
             res.json({ success: true });
         });
 
-        await client.db("admin").command({ ping: 1 });
-        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+        // await client.db("admin").command({ ping: 1 });
+        // console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
         // await client.close();
     }
